@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const translations = {
   zh: {
@@ -46,19 +47,19 @@ export default function Home() {
         <nav className="container mx-auto flex justify-between items-center px-6">
           <div className="text-xl font-bold">XL Green Sport</div>
           <ul className="flex gap-4 items-center">
-            <li><a href="/">{t.home}</a></li>
-            <li><a href="/coaches">{t.coachBooking}</a></li>
-            <li><a href="/products">{t.outdoorEquipment}</a></li>
+            <li><Link href="/">{t.home}</Link></li>
+            <li><Link href="/coaches">{t.coachBooking}</Link></li>
+            <li><Link href="/products">{t.outdoorEquipment}</Link></li>
             {user ? (
               <>
                 <li>{t.welcome}：{user.email}</li>
-                <li><a href="/orders">{t.myOrders}</a></li>
+                <li><Link href="/orders">{t.myOrders}</Link></li>
                 <li><button onClick={handleLogout} className="underline"> {t.logout}</button></li>
               </>
             ) : (
               <>
-                <li><a href="/login">{t.login}</a></li>
-                <li><a href="/register">注册</a></li>
+                <li><Link href="/login">{t.login}</Link></li>
+                <li><Link href="/register">注册</Link></li>
               </>
             )}
           </ul>
@@ -75,20 +76,20 @@ export default function Home() {
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <a href="/coaches" className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition block">
+          <Link href="/coaches" className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition block">
             <h2 className="text-2xl font-semibold">{t.popularCoaches}</h2>
             <p className="text-gray-600">{t.popularCoachesDesc}</p>
-          </a>
+          </Link>
 
-          <a href="/products" className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition block">
+          <Link href="/products" className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition block">
             <h2 className="text-2xl font-semibold">{t.equipmentRental}</h2>
             <p className="text-gray-600">{t.equipmentRentalDesc}</p>
-          </a>
+          </Link>
 
-          <a href="/coach-register" className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition block">
+          <Link href="/coach-register" className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition block">
             <h2 className="text-2xl font-semibold">{t.quickRegister}</h2>
             <p className="text-gray-600">{t.quickRegisterDesc}</p>
-          </a>
+          </Link>
         </section>
       </main>
 
