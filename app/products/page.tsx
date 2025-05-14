@@ -6,18 +6,28 @@ import { supabase } from '@/lib/supabaseClient';
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const { data, error } = await supabase.from('products').select('*');
-      if (error) {
-        console.error('加载商品失败:', error.message);
-      } else {
-        setProducts(data || []);
-      }
-    };
+  const fetchProducts = async () => {
+    const { data, error } = await supabase.from('products').select('*');
+    if (error) {
+      console.error('加载商品失败:', error.message);
+    } else {
+      setProducts(data || []);
+    }
+  };
 
+  useEffect(() => {
     fetchProducts();
   }, []);
+
+  const handleDelete = async (id: number) => {
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (error) {
+      alert('删除失败: ' + error.message);
+    } else {
+      alert('商品已删除');
+      fetchProducts();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-10">
@@ -28,7 +38,21 @@ export default function ProductsPage() {
             <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
             <p className="text-gray-600 mb-1">类型：{product.type}</p>
             <p className="text-gray-600 mb-1">￥{product.price}</p>
-            <p className="text-sm text-gray-500">{product.description}</p>
+            <p className="text-sm text-gray-500 mb-4">{product.description}</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => alert('编辑功能开发中')}
+                className="text-blue-600 border border-blue-600 px-3 py-1 rounded hover:bg-blue-600 hover:text-white"
+              >
+                编辑
+              </button>
+              <button
+                onClick={() => handleDelete(product.id)}
+                className="text-red-600 border border-red-600 px-3 py-1 rounded hover:bg-red-600 hover:text-white"
+              >
+                删除
+              </button>
+            </div>
           </div>
         ))}
         {products.length === 0 && <p>暂无商品。</p>}
