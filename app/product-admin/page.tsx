@@ -1,82 +1,39 @@
 'use client';
-
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function ProductAdminPage() {
-  const [product, setProduct] = useState({
+  const [form, setForm] = useState({
     name: '',
-    description: '',
     price: '',
-    type: '租赁'
+    description: '',
+    type: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setProduct(prev => ({ ...prev, [name]: value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const existing = JSON.parse(localStorage.getItem('productAdmin') || '[]');
-    existing.push({ ...product, price: Number(product.price) });
-    localStorage.setItem('productAdmin', JSON.stringify(existing));
-    alert('商品添加成功');
-    setProduct({ name: '', description: '', price: '', type: '租赁' });
+    const { data, error } = await supabase.from('products').insert([form]);
+    if (error) {
+      alert('添加失败: ' + error.message);
+    } else {
+      alert('商品添加成功！');
+      setForm({ name: '', price: '', description: '', type: '' });
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 shadow-md rounded-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">添加新商品</h2>
-
-        <input
-          type="text"
-          name="name"
-          placeholder="商品名称"
-          value={product.name}
-          onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
-          required
-        />
-
-        <input
-          type="text"
-          name="description"
-          placeholder="商品描述"
-          value={product.description}
-          onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
-          required
-        />
-
-        <input
-          type="number"
-          name="price"
-          placeholder="价格"
-          value={product.price}
-          onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
-          required
-          min={0}
-        />
-
-        <select
-          name="type"
-          value={product.type}
-          onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
-        >
-          <option value="租赁">租赁</option>
-          <option value="购买">购买</option>
-          <option value="租赁/购买">租赁/购买</option>
-        </select>
-
-        <button
-          type="submit"
-          className="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800 transition"
-        >
-          添加商品
-        </button>
+    <div className="min-h-screen bg-gray-100 p-10">
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md max-w-md mx-auto space-y-4">
+        <h1 className="text-xl font-bold">添加商品</h1>
+        <input name="name" placeholder="名称" value={form.name} onChange={handleChange} required className="w-full border p-2" />
+        <input name="price" placeholder="价格" value={form.price} onChange={handleChange} required className="w-full border p-2" />
+        <input name="description" placeholder="描述" value={form.description} onChange={handleChange} required className="w-full border p-2" />
+        <input name="type" placeholder="类型（购买/租赁）" value={form.type} onChange={handleChange} required className="w-full border p-2" />
+        <button type="submit" className="bg-green-700 text-white py-2 px-4 rounded hover:bg-green-800">添加</button>
       </form>
     </div>
   );
