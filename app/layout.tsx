@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -27,14 +28,14 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <nav className="bg-green-700 text-white flex justify-between items-center px-4 py-2 text-sm">
           <div className="flex items-center gap-4">
-            <a href="/" className="hover:underline font-semibold">首页</a>
+            <Link href="/" className="hover:underline font-semibold">首页</Link>
           </div>
           <div className="text-lg font-bold">XL Green Sport</div>
           <div className="flex items-center gap-4">
-            <a href="/orders" className="hover:underline">我的订单</a>
-            <a href="/login" className="hover:underline">登录</a>
-            <a href="/register" className="hover:underline">注册</a>
-            <select className="bg-green-600 border border-white rounded px-1">
+            <Link href="/orders" className="hover:underline">我的订单</Link>
+            <Link href="/login" className="hover:underline">登录</Link>
+            <Link href="/register" className="hover:underline">注册</Link>
+            <select className="bg-green-600 border border-white rounded px-1 text-black">
               <option>中文</option>
               <option>English</option>
               <option>Français</option>
@@ -42,27 +43,13 @@ export default function RootLayout({
           </div>
         </nav>
 
-        <main className="min-h-screen bg-gray-100 p-6">
-          <div className="max-w-5xl mx-auto grid gap-6 grid-cols-1 md:grid-cols-3">
-            <a href="/products" className="bg-white p-6 rounded shadow hover:shadow-lg transition block">
-              <h2 className="text-xl font-bold mb-2">户外装备租赁</h2>
-              <p className="text-gray-600">高品质户外装备，租赁与购买灵活选择</p>
-            </a>
-            <a href="/coaches" className="bg-white p-6 rounded shadow hover:shadow-lg transition block">
-              <h2 className="text-xl font-bold mb-2">预约教练</h2>
-              <p className="text-gray-600">探索最受欢迎的专业户外教练，快速预约课程</p>
-            </a>
-            <a href="/coach-register" className="bg-white p-6 rounded shadow hover:shadow-lg transition block">
-              <h2 className="text-xl font-bold mb-2">注册为教练</h2>
-              <p className="text-gray-600">立即注册，成为平台认证教练</p>
-            </a>
-          </div>
+        <main className="min-h-screen bg-gray-100">
+          {children}
         </main>
 
         <footer className="bg-gray-800 text-white text-center py-4">
           © 2025 XL Green Sport. 保留所有权利。
         </footer>
-
       </body>
     </html>
   );
