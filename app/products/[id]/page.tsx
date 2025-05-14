@@ -3,15 +3,17 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 const productData = {
-  1: { name: '登山背包', price: 30, description: '轻便耐用，适合1-3日徒步旅行', type: '租赁' },
-  2: { name: '帐篷（双人）', price: 80, description: '防风防雨，适合2人露营', type: '购买' },
-  3: { name: '登山杖', price: 20, description: '可调节长度，稳定可靠', type: '租赁/购买' }
+  '1': { name: '登山背包', price: 30, description: '轻便耐用，适合1-3日徒步旅行', type: '租赁' },
+  '2': { name: '帐篷（双人）', price: 80, description: '防风防雨，适合2人露营', type: '购买' },
+  '3': { name: '登山杖', price: 20, description: '可调节长度，稳定可靠', type: '租赁/购买' }
 };
 
 export default function ProductDetailPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const router = useRouter();
   const product = productData[id as keyof typeof productData];
+
   const [mode, setMode] = useState(product?.type === '购买' ? '购买' : '租赁');
   const [value, setValue] = useState('');
   const [user, setUser] = useState<any>(null);
