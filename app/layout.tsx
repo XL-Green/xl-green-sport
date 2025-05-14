@@ -27,6 +27,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <nav className="bg-white shadow px-4 py-3 flex gap-4 text-sm text-black">
+  <a href="/" className="hover:underline">首页</a>
+  <a href="/products" className="hover:underline">装备租售</a>
+  <a href="/coaches" className="hover:underline">教练预约</a>
+  <a href="/orders" className="hover:underline">我的订单</a>
+  <a href="/coach-register" className="hover:underline text-green-700 font-bold">教练注册</a>
+</nav>
+
         {children}
       </body>
     </html>
