@@ -2,40 +2,102 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import Navbar from '@/components/Navbar';
 
 export default function ProductAdminPage() {
-  const [form, setForm] = useState({
-    name: '',
-    price: '',
-    description: '',
-    type: '',
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [type, setType] = useState('租赁'); // 默认值
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { data, error } = await supabase.from('products').insert([form]);
+
+    // 校验
+    if (!name || !price || !type) {
+      alert('请填写所有必填项');
+      return;
+    }
+
+    const { error } = await supabase.from('products').insert([
+      {
+        name,
+        description,
+        price: parseFloat(price),
+        type,
+      }
+    ]);
+
     if (error) {
-      alert('添加失败: ' + error.message);
+      alert('添加失败：' + error.message);
     } else {
-      alert('商品添加成功！');
-      setForm({ name: '', price: '', description: '', type: '' });
+      alert('商品添加成功');
+      setName('');
+      setDescription('');
+      setPrice('');
+      setType('租赁');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-10">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md max-w-md mx-auto space-y-4">
-        <h1 className="text-xl font-bold">添加商品</h1>
-        <input name="name" placeholder="名称" value={form.name} onChange={handleChange} required className="w-full border p-2" />
-        <input name="price" placeholder="价格" value={form.price} onChange={handleChange} required className="w-full border p-2" />
-        <input name="description" placeholder="描述" value={form.description} onChange={handleChange} required className="w-full border p-2" />
-        <input name="type" placeholder="类型（购买/租赁）" value={form.type} onChange={handleChange} required className="w-full border p-2" />
-        <button type="submit" className="bg-green-700 text-white py-2 px-4 rounded hover:bg-green-800">添加</button>
-      </form>
+    <div className="min-h-screen bg-gray-100">
+      <Navbar />
+
+      <main className="p-10 max-w-xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">添加商品</h1>
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow space-y-4">
+          <div>
+            <label className="block mb-1">商品名称 *</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border p-2 rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1">商品描述</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full border p-2 rounded"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1">价格（每件 或 每天）*</label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="w-full border p-2 rounded"
+              required
+              min={0}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1">商品类型 *</label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="w-full border p-2 rounded"
+              required
+            >
+              <option value="租赁">租赁</option>
+              <option value="购买">购买</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800"
+          >
+            添加商品
+          </button>
+        </form>
+      </main>
     </div>
   );
 }
