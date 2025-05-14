@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
 
   const fetchProducts = async () => {
     const { data, error } = await supabase.from('products').select('*');
@@ -29,6 +30,20 @@ export default function ProductsPage() {
     }
   };
 
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    const { id, ...updateData } = editingProduct;
+    const { error } = await supabase.from('products').update(updateData).eq('id', id);
+    if (error) {
+      alert('更新失败: ' + error.message);
+    } else {
+      alert('商品已更新');
+      setEditingProduct(null);
+      fetchProducts();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-10">
       <h1 className="text-2xl font-bold mb-6">商品列表</h1>
@@ -41,7 +56,7 @@ export default function ProductsPage() {
             <p className="text-sm text-gray-500 mb-4">{product.description}</p>
             <div className="flex gap-2">
               <button
-                onClick={() => alert('编辑功能开发中')}
+                onClick={() => setEditingProduct(product)}
                 className="text-blue-600 border border-blue-600 px-3 py-1 rounded hover:bg-blue-600 hover:text-white"
               >
                 编辑
@@ -57,6 +72,40 @@ export default function ProductsPage() {
         ))}
         {products.length === 0 && <p>暂无商品。</p>}
       </div>
+
+      {editingProduct && (
+        <form onSubmit={handleUpdate} className="fixed bottom-0 left-0 right-0 bg-white p-6 shadow-md border-t mt-10">
+          <h2 className="text-lg font-semibold mb-4">编辑商品：{editingProduct.name}</h2>
+          <div className="flex flex-col md:flex-row gap-4">
+            <input
+              className="p-2 border rounded w-full"
+              value={editingProduct.name}
+              onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+              placeholder="商品名称"
+            />
+            <input
+              className="p-2 border rounded w-full"
+              value={editingProduct.price}
+              onChange={(e) => setEditingProduct({ ...editingProduct, price: e.target.value })}
+              placeholder="价格"
+            />
+            <input
+              className="p-2 border rounded w-full"
+              value={editingProduct.description}
+              onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+              placeholder="描述"
+            />
+            <input
+              className="p-2 border rounded w-full"
+              value={editingProduct.type}
+              onChange={(e) => setEditingProduct({ ...editingProduct, type: e.target.value })}
+              placeholder="类型"
+            />
+            <button type="submit" className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">保存</button>
+            <button type="button" onClick={() => setEditingProduct(null)} className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">取消</button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
