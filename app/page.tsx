@@ -75,20 +75,20 @@ export default function Home() {
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white shadow rounded-lg p-6">
+          <a href="/coaches" className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition block">
             <h2 className="text-2xl font-semibold">{t.popularCoaches}</h2>
             <p className="text-gray-600">{t.popularCoachesDesc}</p>
-          </div>
+          </a>
 
-          <div className="bg-white shadow rounded-lg p-6">
+          <a href="/products" className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition block">
             <h2 className="text-2xl font-semibold">{t.equipmentRental}</h2>
             <p className="text-gray-600">{t.equipmentRentalDesc}</p>
-          </div>
+          </a>
 
-          <div className="bg-white shadow rounded-lg p-6">
+          <a href="/coach-register" className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition block">
             <h2 className="text-2xl font-semibold">{t.quickRegister}</h2>
             <p className="text-gray-600">{t.quickRegisterDesc}</p>
-          </div>
+          </a>
         </section>
       </main>
 
