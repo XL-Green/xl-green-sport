@@ -1,102 +1,101 @@
-import Image from "next/image";
+'use client';
+import React, { useEffect, useState } from 'react';
+
+const translations = {
+  zh: {
+    home: '首页',
+    coachBooking: '教练预约',
+    outdoorEquipment: '户外用品',
+    login: '登录/注册',
+    logout: '退出登录',
+    welcome: '欢迎你',
+    headerTitle: '享受户外运动，轻松预约教练和装备',
+    headerSubtitle: '一站式平台，为你的户外体验提供最专业的服务',
+    popularCoaches: '热门教练',
+    popularCoachesDesc: '探索最受欢迎的专业户外教练，快速预约课程',
+    equipmentRental: '户外装备租赁',
+    equipmentRentalDesc: '高品质户外装备，租赁与购买灵活选择',
+    quickRegister: '快速注册',
+    quickRegisterDesc: '立即注册，开始你的户外探险之旅',
+    footer: '© 2025 XL Green Sport. 保留所有权利。',
+    myOrders: '我的订单'
+  }
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [lang, setLang] = useState('zh');
+  const t = translations[lang];
+  const [user, setUser] = useState<{ email: string } | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+  useEffect(() => {
+    const stored = localStorage.getItem('currentUser');
+    if (stored) {
+      setUser(JSON.parse(stored));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser');
+    setUser(null);
+    alert('已退出登录');
+  };
+
+  return (
+    <div className="font-sans min-h-screen bg-gray-100 text-black">
+      <header className="bg-green-700 text-white py-4 shadow">
+        <nav className="container mx-auto flex justify-between items-center px-6">
+          <div className="text-xl font-bold">XL Green Sport</div>
+          <ul className="flex gap-4 items-center">
+            <li><a href="/">{t.home}</a></li>
+            <li><a href="/coaches">{t.coachBooking}</a></li>
+            <li><a href="/products">{t.outdoorEquipment}</a></li>
+            {user ? (
+              <>
+                <li>{t.welcome}：{user.email}</li>
+                <li><a href="/orders">{t.myOrders}</a></li>
+                <li><button onClick={handleLogout} className="underline"> {t.logout}</button></li>
+              </>
+            ) : (
+              <>
+                <li><a href="/login">{t.login}</a></li>
+                <li><a href="/register">注册</a></li>
+              </>
+            )}
+          </ul>
+          <select className="text-black" value={lang} onChange={(e) => setLang(e.target.value)}>
+            <option value="zh">中文</option>
+          </select>
+        </nav>
+      </header>
+
+      <main className="container mx-auto py-10 px-6">
+        <section className="text-center mb-10">
+          <h1 className="text-4xl font-bold mb-4">{t.headerTitle}</h1>
+          <p className="text-gray-700">{t.headerSubtitle}</p>
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white shadow rounded-lg p-6">
+            <h2 className="text-2xl font-semibold">{t.popularCoaches}</h2>
+            <p className="text-gray-600">{t.popularCoachesDesc}</p>
+          </div>
+
+          <div className="bg-white shadow rounded-lg p-6">
+            <h2 className="text-2xl font-semibold">{t.equipmentRental}</h2>
+            <p className="text-gray-600">{t.equipmentRentalDesc}</p>
+          </div>
+
+          <div className="bg-white shadow rounded-lg p-6">
+            <h2 className="text-2xl font-semibold">{t.quickRegister}</h2>
+            <p className="text-gray-600">{t.quickRegisterDesc}</p>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="bg-gray-800 text-gray-400 py-4">
+        <div className="container mx-auto text-center">
+          {t.footer}
+        </div>
       </footer>
     </div>
   );
