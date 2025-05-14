@@ -52,11 +52,16 @@ export default function ProductsPage() {
     e.preventDefault();
     if (!selectedProduct) return;
 
-    let order: any = {
-      product_id: selectedProduct.id,
-      product_name: selectedProduct.name,
-      type: selectedProduct.type,
-    };
+    const storedUser = localStorage.getItem('currentUser');
+const userEmail = storedUser ? JSON.parse(storedUser).email : '未知用户';
+
+let order: any = {
+  product_id: selectedProduct.id,
+  product_name: selectedProduct.name,
+  type: selectedProduct.type,
+  user_email: userEmail,
+};
+
 
     if (selectedProduct.type === '购买') {
       if (!orderQuantity || isNaN(parseInt(orderQuantity))) {

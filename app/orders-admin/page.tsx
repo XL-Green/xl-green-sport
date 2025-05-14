@@ -40,6 +40,7 @@ export default function OrdersAdminPage() {
             <div key={order.id} className="bg-white p-6 rounded shadow">
               <h2 className="text-xl font-semibold mb-2">{order.product_name}</h2>
               <p className="text-gray-600 mb-1">类型：{order.type}</p>
+              <p className="text-gray-600 mb-1">用户邮箱：{order.user_email || '未知'}</p>
               {order.type === '购买' ? (
                 <p className="text-gray-600 mb-1">数量：{order.quantity}</p>
               ) : (
