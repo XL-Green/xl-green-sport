@@ -2,11 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
-const coachData = {
-  1: { name: '张教练', bio: '专注登山徒步10年', price: 200 },
-  2: { name: '李教练', bio: '滑雪教练，经验丰富', price: 180 },
-  3: { name: '王教练', bio: '专业攀岩与高空挑战导师', price: 220 }
+const coachData: Record<number, { name: string; bio: string; price: number }> = {
+  1: { name: '张三', bio: '...', price: 100 },
+  2: { name: '李四', bio: '...', price: 120 },
+  3: { name: '王五', bio: '...', price: 150 }
 };
+
 
 export default function CoachBookingPage() {
   const { id } = useParams();
