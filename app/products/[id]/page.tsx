@@ -11,7 +11,7 @@ const productData = {
 export default function ProductDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const product = productData[Number(id)];
+  const product = productData[id as keyof typeof productData];
   const [mode, setMode] = useState(product?.type === '购买' ? '购买' : '租赁');
   const [value, setValue] = useState('');
   const [user, setUser] = useState<any>(null);
