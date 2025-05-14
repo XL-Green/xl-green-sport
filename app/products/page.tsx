@@ -52,21 +52,25 @@ export default function ProductsPage() {
     e.preventDefault();
     if (!selectedProduct) return;
 
-    let order = {
+    let order: any = {
       product_id: selectedProduct.id,
       product_name: selectedProduct.name,
       type: selectedProduct.type,
     };
 
     if (selectedProduct.type === '购买') {
-      order = { ...order, quantity: parseInt(orderQuantity) };
+      if (!orderQuantity || isNaN(parseInt(orderQuantity))) {
+        alert('请输入有效的购买数量');
+        return;
+      }
+      order.quantity = parseInt(orderQuantity);
     } else if (selectedProduct.type === '租赁') {
-      // 日期格式校验
       if (!rentalStart || !rentalEnd) {
         alert('请输入完整的租赁日期');
         return;
       }
-      order = { ...order, rental_start: rentalStart, rental_end: rentalEnd };
+      order.rental_start = rentalStart;
+      order.rental_end = rentalEnd;
     }
 
     const { error } = await supabase.from('orders').insert([order]);
