@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabaseClient';
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [inputValue, setInputValue] = useState('');
 
   const fetchProducts = async () => {
     const { data, error } = await supabase.from('products').select('*');
@@ -44,25 +46,38 @@ export default function ProductsPage() {
     }
   };
 
+  const handleOrderSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert(`${selectedProduct.name} 下单成功！数量/天数: ${inputValue}`);
+    setSelectedProduct(null);
+    setInputValue('');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-10">
       <h1 className="text-2xl font-bold mb-6">商品列表</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
-          <div key={product.id} className="bg-white shadow p-6 rounded">
+          <div key={product.id} className="bg-white shadow p-6 rounded cursor-pointer" onClick={() => setSelectedProduct(product)}>
             <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
             <p className="text-gray-600 mb-1">类型：{product.type}</p>
             <p className="text-gray-600 mb-1">￥{product.price}</p>
             <p className="text-sm text-gray-500 mb-4">{product.description}</p>
             <div className="flex gap-2">
               <button
-                onClick={() => setEditingProduct(product)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingProduct(product);
+                }}
                 className="text-blue-600 border border-blue-600 px-3 py-1 rounded hover:bg-blue-600 hover:text-white"
               >
                 编辑
               </button>
               <button
-                onClick={() => handleDelete(product.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(product.id);
+                }}
                 className="text-red-600 border border-red-600 px-3 py-1 rounded hover:bg-red-600 hover:text-white"
               >
                 删除
@@ -105,6 +120,30 @@ export default function ProductsPage() {
             <button type="button" onClick={() => setEditingProduct(null)} className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">取消</button>
           </div>
         </form>
+      )}
+
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-md w-full max-w-sm">
+            <h2 className="text-xl font-bold mb-2">{selectedProduct.name}</h2>
+            <p className="text-sm text-gray-600 mb-4">{selectedProduct.description}</p>
+            <form onSubmit={handleOrderSubmit}>
+              <label className="block mb-2">{selectedProduct.type === '购买' ? '购买数量' : '租赁天数'}:</label>
+              <input
+                type="number"
+                className="w-full p-2 border mb-4 rounded"
+                min={1}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                required
+              />
+              <div className="flex justify-between">
+                <button type="submit" className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">确认</button>
+                <button type="button" onClick={() => setSelectedProduct(null)} className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">取消</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
