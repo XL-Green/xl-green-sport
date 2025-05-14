@@ -24,7 +24,7 @@ const translations = {
 
 export default function Home() {
   const [lang, setLang] = useState('zh');
-  const t = translations[lang];
+  const t = translations[lang as keyof typeof translations];
   const [user, setUser] = useState<{ email: string } | null>(null);
 
   useEffect(() => {
