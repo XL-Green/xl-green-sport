@@ -16,8 +16,8 @@ const translations = {
     popularCoachesDesc: '探索最受欢迎的专业户外教练，快速预约课程',
     equipmentRental: '户外装备租赁',
     equipmentRentalDesc: '高品质户外装备，租赁与购买灵活选择',
-    quickRegister: '快速注册',
-    quickRegisterDesc: '立即注册，开始你的户外探险之旅',
+    quickRegister: '申请成为教练',
+    quickRegisterDesc: '填写信息，注册成为平台教练',
     footer: '© 2025 XL Green Sport. 保留所有权利。',
     myOrders: '我的订单'
   }
@@ -43,31 +43,7 @@ export default function Home() {
 
   return (
     <div className="font-sans min-h-screen bg-gray-100 text-black">
-      <header className="bg-green-700 text-white py-4 shadow">
-        <nav className="container mx-auto flex justify-between items-center px-6">
-          <div className="text-xl font-bold">XL Green Sport</div>
-          <ul className="flex gap-4 items-center">
-            <li><Link href="/">{t.home}</Link></li>
-            <li><Link href="/coaches">{t.coachBooking}</Link></li>
-            <li><Link href="/products">{t.outdoorEquipment}</Link></li>
-            {user ? (
-              <>
-                <li>{t.welcome}：{user.email}</li>
-                <li><Link href="/orders">{t.myOrders}</Link></li>
-                <li><button onClick={handleLogout} className="underline"> {t.logout}</button></li>
-              </>
-            ) : (
-              <>
-                <li><Link href="/login">{t.login}</Link></li>
-                <li><Link href="/register">注册</Link></li>
-              </>
-            )}
-          </ul>
-          <select className="text-black" value={lang} onChange={(e) => setLang(e.target.value)}>
-            <option value="zh">中文</option>
-          </select>
-        </nav>
-      </header>
+    
 
       <main className="container mx-auto py-10 px-6">
         <section className="text-center mb-10">
