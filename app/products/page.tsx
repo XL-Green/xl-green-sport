@@ -7,7 +7,9 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
-  const [inputValue, setInputValue] = useState('');
+  const [orderQuantity, setOrderQuantity] = useState('');
+  const [rentalStart, setRentalStart] = useState('');
+  const [rentalEnd, setRentalEnd] = useState('');
 
   const fetchProducts = async () => {
     const { data, error } = await supabase.from('products').select('*');
@@ -46,11 +48,29 @@ export default function ProductsPage() {
     }
   };
 
-  const handleOrderSubmit = (e: React.FormEvent) => {
+  const handleOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`${selectedProduct.name} 下单成功！数量/天数: ${inputValue}`);
-    setSelectedProduct(null);
-    setInputValue('');
+    if (!selectedProduct) return;
+
+    const order = {
+      product_id: selectedProduct.id,
+      product_name: selectedProduct.name,
+      type: selectedProduct.type,
+      quantity: orderQuantity,
+      rental_start: rentalStart,
+      rental_end: rentalEnd,
+    };
+
+    const { error } = await supabase.from('orders').insert([order]);
+    if (error) {
+      alert('下单失败: ' + error.message);
+    } else {
+      alert('下单成功！');
+      setSelectedProduct(null);
+      setOrderQuantity('');
+      setRentalStart('');
+      setRentalEnd('');
+    }
   };
 
   return (
@@ -92,30 +112,14 @@ export default function ProductsPage() {
         <form onSubmit={handleUpdate} className="fixed bottom-0 left-0 right-0 bg-white p-6 shadow-md border-t mt-10">
           <h2 className="text-lg font-semibold mb-4">编辑商品：{editingProduct.name}</h2>
           <div className="flex flex-col md:flex-row gap-4">
-            <input
-              className="p-2 border rounded w-full"
-              value={editingProduct.name}
-              onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
-              placeholder="商品名称"
-            />
-            <input
-              className="p-2 border rounded w-full"
-              value={editingProduct.price}
-              onChange={(e) => setEditingProduct({ ...editingProduct, price: e.target.value })}
-              placeholder="价格"
-            />
-            <input
-              className="p-2 border rounded w-full"
-              value={editingProduct.description}
-              onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
-              placeholder="描述"
-            />
-            <input
-              className="p-2 border rounded w-full"
-              value={editingProduct.type}
-              onChange={(e) => setEditingProduct({ ...editingProduct, type: e.target.value })}
-              placeholder="类型"
-            />
+            <input className="p-2 border rounded w-full" value={editingProduct.name} onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })} placeholder="商品名称" />
+            <input className="p-2 border rounded w-full" value={editingProduct.price} onChange={(e) => setEditingProduct({ ...editingProduct, price: e.target.value })} placeholder="价格" />
+            <input className="p-2 border rounded w-full" value={editingProduct.description} onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })} placeholder="描述" />
+            <select className="p-2 border rounded w-full" value={editingProduct.type} onChange={(e) => setEditingProduct({ ...editingProduct, type: e.target.value })}>
+              <option value="">选择类型</option>
+              <option value="购买">购买</option>
+              <option value="租赁">租赁</option>
+            </select>
             <button type="submit" className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">保存</button>
             <button type="button" onClick={() => setEditingProduct(null)} className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">取消</button>
           </div>
@@ -128,15 +132,20 @@ export default function ProductsPage() {
             <h2 className="text-xl font-bold mb-2">{selectedProduct.name}</h2>
             <p className="text-sm text-gray-600 mb-4">{selectedProduct.description}</p>
             <form onSubmit={handleOrderSubmit}>
-              <label className="block mb-2">{selectedProduct.type === '购买' ? '购买数量' : '租赁天数'}:</label>
-              <input
-                type="number"
-                className="w-full p-2 border mb-4 rounded"
-                min={1}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                required
-              />
+              {selectedProduct.type === '购买' && (
+                <div className="mb-4">
+                  <label className="block mb-1">购买数量:</label>
+                  <input type="number" min={1} value={orderQuantity} onChange={(e) => setOrderQuantity(e.target.value)} className="w-full p-2 border rounded" />
+                </div>
+              )}
+              {selectedProduct.type === '租赁' && (
+                <div className="mb-4">
+                  <label className="block mb-1">租赁开始日期:</label>
+                  <input type="date" value={rentalStart} onChange={(e) => setRentalStart(e.target.value)} className="w-full p-2 border rounded" />
+                  <label className="block mt-2 mb-1">租赁结束日期:</label>
+                  <input type="date" value={rentalEnd} onChange={(e) => setRentalEnd(e.target.value)} className="w-full p-2 border rounded" />
+                </div>
+              )}
               <div className="flex justify-between">
                 <button type="submit" className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">确认</button>
                 <button type="button" onClick={() => setSelectedProduct(null)} className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">取消</button>
