@@ -1,63 +1,57 @@
 'use client';
-import React, { useEffect, useState } from 'react';
 
-export default function OrdersPage() {
-  const [coachOrders, setCoachOrders] = useState<any[]>([]);
-  const [productOrders, setProductOrders] = useState<any[]>([]);
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+
+export default function MyOrdersPage() {
+  const [orders, setOrders] = useState<any[]>([]);
+  const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
-    const coachStored = localStorage.getItem('coachOrders');
-    if (coachStored) setCoachOrders(JSON.parse(coachStored));
-
-    const productStored = localStorage.getItem('productOrders');
-    if (productStored) setProductOrders(JSON.parse(productStored));
+    const stored = localStorage.getItem('currentUser');
+    if (stored) {
+      const { email } = JSON.parse(stored);
+      setUserEmail(email);
+      fetchUserOrders(email);
+    }
   }, []);
 
+  const fetchUserOrders = async (email: string) => {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('user_email', email)
+      .order('id', { ascending: false });
+    if (error) {
+      alert('加载订单失败：' + error.message);
+    } else {
+      setOrders(data || []);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-6">
-      <h1 className="text-3xl font-bold text-center mb-8">我的订单</h1>
-
-      {/* 教练订单 */}
-      <section className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">教练预约记录</h2>
-        {coachOrders.length === 0 ? (
-          <p className="text-gray-500">暂无预约记录。</p>
-        ) : (
-          <div className="space-y-4">
-            {coachOrders.map((order, index) => (
-              <div key={index} className="bg-white p-4 rounded shadow">
-                <p><strong>教练：</strong>{order.coachName}</p>
-                <p><strong>日期：</strong>{order.date}</p>
-                <p><strong>时间：</strong>{order.time}</p>
-                <p><strong>价格：</strong>￥{order.price}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 商品订单 */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">用品租赁/购买记录</h2>
-        {productOrders.length === 0 ? (
-          <p className="text-gray-500">暂无记录。</p>
-        ) : (
-          <div className="space-y-4">
-            {productOrders.map((order, index) => (
-              <div key={index} className="bg-white p-4 rounded shadow">
-                <p><strong>商品：</strong>{order.itemName}</p>
-                <p><strong>类型：</strong>{order.type}</p>
-                {order.type === '租赁' ? (
-                  <p><strong>租赁天数：</strong>{order.days} 天</p>
-                ) : (
-                  <p><strong>购买数量：</strong>{order.quantity} 件</p>
-                )}
-                <p><strong>总价：</strong>￥{order.price}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+    <div className="min-h-screen bg-gray-100 p-10">
+      <h1 className="text-2xl font-bold mb-6">我的订单</h1>
+      {orders.length === 0 ? (
+        <p>暂无订单。</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {orders.map((order) => (
+            <div key={order.id} className="bg-white p-6 rounded shadow">
+              <h2 className="text-xl font-semibold mb-2">{order.product_name}</h2>
+              <p className="text-gray-600 mb-1">类型：{order.type}</p>
+              {order.type === '购买' ? (
+                <p className="text-gray-600 mb-1">数量：{order.quantity}</p>
+              ) : (
+                <>
+                  <p className="text-gray-600 mb-1">起始：{order.rental_start}</p>
+                  <p className="text-gray-600 mb-1">结束：{order.rental_end}</p>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
