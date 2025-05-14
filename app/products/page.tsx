@@ -52,14 +52,22 @@ export default function ProductsPage() {
     e.preventDefault();
     if (!selectedProduct) return;
 
-    const order = {
+    let order = {
       product_id: selectedProduct.id,
       product_name: selectedProduct.name,
       type: selectedProduct.type,
-      quantity: orderQuantity,
-      rental_start: rentalStart,
-      rental_end: rentalEnd,
     };
+
+    if (selectedProduct.type === '购买') {
+      order = { ...order, quantity: parseInt(orderQuantity) };
+    } else if (selectedProduct.type === '租赁') {
+      // 日期格式校验
+      if (!rentalStart || !rentalEnd) {
+        alert('请输入完整的租赁日期');
+        return;
+      }
+      order = { ...order, rental_start: rentalStart, rental_end: rentalEnd };
+    }
 
     const { error } = await supabase.from('orders').insert([order]);
     if (error) {
@@ -135,15 +143,15 @@ export default function ProductsPage() {
               {selectedProduct.type === '购买' && (
                 <div className="mb-4">
                   <label className="block mb-1">购买数量:</label>
-                  <input type="number" min={1} value={orderQuantity} onChange={(e) => setOrderQuantity(e.target.value)} className="w-full p-2 border rounded" />
+                  <input type="number" min={1} value={orderQuantity} onChange={(e) => setOrderQuantity(e.target.value)} className="w-full p-2 border rounded" required />
                 </div>
               )}
               {selectedProduct.type === '租赁' && (
                 <div className="mb-4">
                   <label className="block mb-1">租赁开始日期:</label>
-                  <input type="date" value={rentalStart} onChange={(e) => setRentalStart(e.target.value)} className="w-full p-2 border rounded" />
+                  <input type="date" value={rentalStart} onChange={(e) => setRentalStart(e.target.value)} className="w-full p-2 border rounded" required />
                   <label className="block mt-2 mb-1">租赁结束日期:</label>
-                  <input type="date" value={rentalEnd} onChange={(e) => setRentalEnd(e.target.value)} className="w-full p-2 border rounded" />
+                  <input type="date" value={rentalEnd} onChange={(e) => setRentalEnd(e.target.value)} className="w-full p-2 border rounded" required />
                 </div>
               )}
               <div className="flex justify-between">
