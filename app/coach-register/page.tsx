@@ -1,82 +1,60 @@
 'use client';
+
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function CoachRegisterPage() {
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [bio, setBio] = useState('');
-  const [price, setPrice] = useState('');
-  const [photo, setPhoto] = useState('');
-  const router = useRouter();
+  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !bio || !price) {
-      alert('请填写所有必填项');
-      return;
+    const { error } = await supabase.from('coaches').insert([{ name, email, bio }]);
+    if (error) {
+      alert('提交失败：' + error.message);
+    } else {
+      setSuccess(true);
+      setName('');
+      setEmail('');
+      setBio('');
     }
-
-    const newCoach = {
-      name,
-      bio,
-      price: Number(price),
-      photo,
-    };
-
-    const existing = JSON.parse(localStorage.getItem('coaches') || '[]');
-    existing.push(newCoach);
-    localStorage.setItem('coaches', JSON.stringify(existing));
-
-    alert('提交成功！等待平台审核后上线。');
-    router.push('/');
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 text-black">
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 py-6 w-full max-w-lg">
-        <h1 className="text-2xl font-bold mb-4">教练注册</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <form onSubmit={handleSubmit} className="bg-white p-8 shadow-md rounded w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">教练注册</h2>
 
-        <label className="block mb-2">姓名 *</label>
+        {success && <p className="text-green-600 text-center mb-4">注册成功！我们会尽快联系你。</p>}
+
         <input
           type="text"
+          placeholder="姓名"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="border w-full p-2 rounded mb-4"
+          className="w-full p-2 mb-4 border border-gray-300 rounded"
           required
         />
-
-        <label className="block mb-2">个人简介 *</label>
+        <input
+          type="email"
+          placeholder="邮箱"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-2 mb-4 border border-gray-300 rounded"
+          required
+        />
         <textarea
+          placeholder="个人介绍"
           value={bio}
           onChange={(e) => setBio(e.target.value)}
-          className="border w-full p-2 rounded mb-4"
-          required
-        />
-
-        <label className="block mb-2">每次教学收费（元） *</label>
-        <input
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          className="border w-full p-2 rounded mb-4"
-          required
-          min={0}
-        />
-
-        <label className="block mb-2">照片链接（可选）</label>
-        <input
-          type="text"
-          value={photo}
-          onChange={(e) => setPhoto(e.target.value)}
-          className="border w-full p-2 rounded mb-4"
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800 transition"
-        >
-          提交注册申请
+          className="w-full p-2 mb-4 border border-gray-300 rounded"
+          rows={4}
+        ></textarea>
+        <button type="submit" className="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800 transition">
+          提交
         </button>
       </form>
     </div>
