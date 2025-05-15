@@ -1,53 +1,49 @@
 'use client';
-import React from 'react';
-import { useRouter } from 'next/navigation';
 
-const coachList = [
-  {
-    id: 1,
-    name: '张教练',
-    bio: '专注登山徒步10年，带你探索自然之美。',
-    avatar: 'https://via.placeholder.com/150'
-  },
-  {
-    id: 2,
-    name: '李教练',
-    bio: '滑雪教练，经验丰富，适合初学者与进阶者。',
-    avatar: 'https://via.placeholder.com/150'
-  },
-  {
-    id: 3,
-    name: '王教练',
-    bio: '专业攀岩与高空挑战项目导师。',
-    avatar: 'https://via.placeholder.com/150'
-  }
-];
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import Navbar from '@/components/Navbar';
 
-export default function CoachListPage() {
-  const router = useRouter();
+export default function CoachesPage() {
+  const [coaches, setCoaches] = useState<any[]>([]);
 
-  const goToBooking = (id: number) => {
-    router.push(`/coaches/${id}`);
-  };
+  useEffect(() => {
+    const fetchCoaches = async () => {
+      const { data, error } = await supabase
+        .from('coaches')
+        .select('*')
+        .eq('status', '已通过'); // ✅ 只显示已通过的教练
+      if (error) {
+        alert('加载教练失败：' + error.message);
+      } else {
+        setCoaches(data || []);
+      }
+    };
+
+    fetchCoaches();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-6">
-      <h1 className="text-3xl font-bold text-center mb-8">选择教练预约课程</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {coachList.map((coach) => (
-          <div key={coach.id} className="bg-white shadow-md rounded-lg p-6 text-center">
-            <img src={coach.avatar} alt={coach.name} className="mx-auto rounded-full w-24 h-24 mb-4" />
-            <h2 className="text-xl font-semibold">{coach.name}</h2>
-            <p className="text-gray-600 mb-4">{coach.bio}</p>
-            <button
-              onClick={() => goToBooking(coach.id)}
-              className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 transition"
-            >
-              预约
-            </button>
+    <div className="min-h-screen bg-gray-100">
+      <Navbar />
+
+      <main className="p-10">
+        <h1 className="text-2xl font-bold mb-6">可预约的教练</h1>
+        {coaches.length === 0 ? (
+          <p>暂无可预约教练。</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {coaches.map((coach) => (
+              <div key={coach.id} className="bg-white p-6 rounded shadow">
+                <h2 className="text-xl font-semibold mb-2">{coach.name}</h2>
+                <p className="text-gray-600 mb-1">邮箱：{coach.email}</p>
+                <p className="text-gray-600 mb-1">简介：{coach.bio}</p>
+                {/* 如果你有预约功能按钮，可以加在这里 */}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        )}
+      </main>
     </div>
   );
 }
